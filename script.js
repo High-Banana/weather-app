@@ -9,6 +9,8 @@ const currentTemperature = document.getElementById("temperature");
 const windSpeedElement = document.getElementById("wind-speed");
 const uvIndexElement = document.getElementById("uv-index");
 const visibilityDistanceElement = document.getElementById("visibility-distance");
+const errorMessasge = document.createElement("span");
+
 let userLocation;
 
 async function getWeatherInfo() {
@@ -18,8 +20,21 @@ async function getWeatherInfo() {
     userLocation = inputValue.value;
   }
   const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=c60ff071c6fc43dabf591902231610&q=${userLocation}`);
+
+  if (response.status === 400) {
+    errorMessasge.textContent = "Location not found";
+    errorMessasge.classList.add("error-message");
+    if (!document.body.querySelector(".error-message")) {
+      document.querySelector("nav").appendChild(errorMessasge);
+    }
+    return;
+  } else {
+    if (document.querySelector("nav").querySelector(".error-message")) {
+      document.querySelector("nav").removeChild(errorMessasge);
+    }
+  }
+
   const data = await response.json();
-  console.log(data);
 
   const countryName = data.location.country;
   const cityName = data.location.name;
@@ -33,18 +48,7 @@ async function getWeatherInfo() {
   const uvIndex = data.current.uv;
   const visibilityDistanceKM = data.current.vis_km;
   const visibilityDistanceMiles = data.current.vis_miles;
-  console.log(
-    countryName,
-    cityName,
-    weatherCondition,
-    feelsLikeInCelsius,
-    feelsLikeInInFahrenheit,
-    tempInCelsius,
-    tempInFahrenheit,
-    windInKPH,
-    windInMPH,
-    uvIndex
-  );
+
   const tempDegreeUnit = document.createElement("span");
   tempDegreeUnit.classList.add("temperature-unit");
   tempDegreeUnit.innerHTML = "<sup>&degC</sup>";
@@ -68,13 +72,10 @@ async function getWeatherInfo() {
   inputValue.value = "";
 
   if (weatherCondition.toLowerCase().includes("clear")) {
-    console.log("rain");
     document.body.style.backgroundImage = "url('./images/sunny.jpeg')";
   } else if (weatherCondition.toLowerCase().includes("cloudy")) {
-    console.log("not rain");
     document.body.style.backgroundImage = "url('./images/cloud.jpeg')";
   } else if (weatherCondition.toLowerCase().includes("thunder")) {
-    console.log("clear");
     document.body.style.backgroundImage = "url('./images/thunder.jpeg')";
   } else if (weatherCondition.toLowerCase().includes("rain")) {
     document.body.style.backgroundImage = "url('./images/rain.jpeg')";

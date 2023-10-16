@@ -20,6 +20,7 @@ async function getWeatherInfo() {
   const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=c60ff071c6fc43dabf591902231610&q=${userLocation}`);
   const data = await response.json();
   console.log(data);
+
   const countryName = data.location.country;
   const cityName = data.location.name;
   const weatherCondition = data.current.condition.text;
@@ -64,6 +65,22 @@ async function getWeatherInfo() {
   secondaryTemperatureElement.appendChild(secondaryTempDegreeUnit);
   uvIndexElement.textContent = `UV Index: ${uvIndex}`;
   visibilityDistanceElement.textContent = `Visibility Distance: ${visibilityDistanceKM} KM`;
+  inputValue.value = "";
+
+  if (weatherCondition.toLowerCase().includes("clear")) {
+    console.log("rain");
+    document.body.style.backgroundImage = "url('./images/sunny.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("cloudy")) {
+    console.log("not rain");
+    document.body.style.backgroundImage = "url('./images/cloud.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("thunder")) {
+    console.log("clear");
+    document.body.style.backgroundImage = "url('./images/thunder.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("rain")) {
+    document.body.style.backgroundImage = "url('./images/rain.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("mist")) {
+    document.body.style.backgroundImage = "url('./images/mist.jpeg')";
+  }
 }
 
 getWeatherInfo();

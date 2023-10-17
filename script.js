@@ -16,26 +16,36 @@ let userLocation;
 async function getWeatherInfo() {
   if (!userLocation) {
     userLocation = "Bhaktapur";
+  } else if (inputValue.value === "") {
+    return;
   } else {
     userLocation = inputValue.value;
   }
   const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=c60ff071c6fc43dabf591902231610&q=${userLocation}`);
 
   if (response.status === 400) {
-    errorMessasge.textContent = "Location not found";
-    errorMessasge.classList.add("error-message");
-    if (!document.body.querySelector(".error-message")) {
-      document.querySelector("nav").appendChild(errorMessasge);
-    }
+    throwErrorMessage();
     return;
   } else {
     if (document.querySelector("nav").querySelector(".error-message")) {
       document.querySelector("nav").removeChild(errorMessasge);
     }
+    const data = await response.json();
+    displayWeatherInfo(data);
   }
+}
 
-  const data = await response.json();
+getWeatherInfo();
 
+function throwErrorMessage() {
+  errorMessasge.textContent = "Location not found";
+  errorMessasge.classList.add("error-message");
+  if (!document.body.querySelector(".error-message")) {
+    document.querySelector("nav").appendChild(errorMessasge);
+  }
+}
+
+function displayWeatherInfo(data) {
   const countryName = data.location.country;
   const cityName = data.location.name;
   const weatherCondition = data.current.condition.text;
@@ -71,7 +81,7 @@ async function getWeatherInfo() {
   visibilityDistanceElement.textContent = `Visibility Distance: ${visibilityDistanceKM} KM`;
   inputValue.value = "";
 
-  if (weatherCondition.toLowerCase().includes("clear")) {
+  if (weatherCondition.toLowerCase().includes("clear") || weatherCondition.toLowerCase().includes("sunny")) {
     document.body.style.backgroundImage = "url('./images/sunny.jpeg')";
   } else if (weatherCondition.toLowerCase().includes("cloudy")) {
     document.body.style.backgroundImage = "url('./images/cloud.jpeg')";
@@ -81,10 +91,14 @@ async function getWeatherInfo() {
     document.body.style.backgroundImage = "url('./images/rain.jpeg')";
   } else if (weatherCondition.toLowerCase().includes("mist")) {
     document.body.style.backgroundImage = "url('./images/mist.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("snow")) {
+    document.body.style.backgroundImage = "url('./images/snow.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("drizzle")) {
+    document.body.style.backgroundImage = "url('./images/drizzle.jpeg')";
+  } else if (weatherCondition.toLowerCase().includes("overcast")) {
+    document.body.style.backgroundImage = "url('./images/overcast.jpeg')";
   }
 }
-
-getWeatherInfo();
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
